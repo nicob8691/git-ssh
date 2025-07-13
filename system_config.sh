@@ -11,6 +11,8 @@ usermod -G gitusers $(id -nu 1000)
 
 #--- Configure local repo /home/git
 sudo install -d -o root -g gitusers -m 770 /home/git
+semanage fcontext -a -t public_content_rw_t "/home/git(/.*)?"
+restorecon -R /home/git
 
 #--- Configuring git
 git config --system core.editor nano
