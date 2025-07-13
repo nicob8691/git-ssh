@@ -27,7 +27,7 @@ do
 	if [ -f $FOLDER/OWNER ]; then chmod 440 $FOLDER/OWNER; fi
 
 	#--- Enable repository to other users
-	git config --global --add safe.directory $FOLDER/OWNER
+	git config --global --add safe.directory $FOLDER
 
 done
 
