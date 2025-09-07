@@ -6,16 +6,24 @@ git config --global user.name "$(whoami)@$(hostname)"
 git config --global user.email "nicob8691@gmail.com"
 
 #--- Creating and activating ssh key for @github.com
-ssh-keygen -t ed25519 -C "$(whoami)@$(hostname)"
+SSH_KEY="$HOME/.ssh/id_ed25519"
+if [ ! -f "$SSH_KEY" ]; then
+	ssh-keygen -t ed25519 -C "$(whoami)@$(hostname)" -f "$SSH_KEY" -N ""
+fi
 
 #--- Prompting public key for adding it to github.com
-echo
-cat ~/.ssh/id_ed25519.pub
-echo
+echo "👉 Public key to add to GitHub:"
+echo "--------------------------------"
+cat "${SSH_KEY}.pub"
+echo "--------------------------------"
 read -p "Make sure you copied pub key to github.com authorised keys. Continue?" -n1 -s
 echo
 
 #--- Testing connection
-ssh -T git@github.com
+echo "🔍 Testing SSH connection to GitHub..."
+ssh -T git@github.com || {
+    echo "❌ SSH connection to GitHub failed. Make sure the key is added and GitHub trusts it."
+    exit 1
+}
 
 ### END ###

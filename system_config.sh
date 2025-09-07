@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-if [ "$EUID" -ne 0 ]; then echo "This scritp shall be run by root."; exit 1; fi
+#--- Ensure the script is run as root
+if [ "$EUID" -ne 0 ]; then echo "This script shall be run by root."; exit 1; fi
 
 #--- Create gitusers group
 if [ $(getent group | grep gitusers | wc -l) -eq 0 ]; then 
