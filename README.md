@@ -1,12 +1,14 @@
 # git-ssh
 
-### SERVER - Check out ip address & sshkey fingerprint on ssh server
+### SERVER
+Check out ip address & sshkey fingerprint on ssh server
 ```bash
 ip a
 sudo ssh-keygen -l -f /etc/ssh/ssh_host_ed25519_key.pub
 ```
 
-### CLIENT - Connect to server through ssh
+### CLIENT
+Remove older ssh fingerprint, then connect to server through ssh
 ```bash
 ssh-keygen -R [ip]
 ssh root@[ip]
