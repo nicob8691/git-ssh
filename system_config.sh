@@ -12,6 +12,8 @@ usermod -aG gitusers $(id -nu 1000)
 
 #--- Configure local repo /home/git
 sudo install -d -o root -g gitusers -m 770 /home/git
+
+dnf install -y policycoreutils-python-utils
 semanage fcontext -a -t public_content_rw_t "/home/git(/.*)?"
 restorecon -R /home/git
 
