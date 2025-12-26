@@ -33,7 +33,7 @@ for repo in "$@"; do
 	[ -f "$FOLDER/OWNER" ] && chmod 440 "$FOLDER/OWNER"
 
 	#--- Allow global git access to this directory
-	git config --global --add safe.directory "$FOLDER"
+	git config --system --add safe.directory "$FOLDER"
 
 done
 
