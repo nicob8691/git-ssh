@@ -11,10 +11,24 @@ fi
 usermod -aG gitusers $(id -nu 1000)
 
 #--- Configure local repo /home/git
-sudo install -d -o root -g gitusers -m 770 /home/git
+DIR="/home/git"
+mkdir -p $DIR
+chown root:gitusers $DIR
+chmod 2770 $DIR
+#sudo install -d -o root -g gitusers -m 770 $DIR
+
+find $DIR -type f -exec chmod 0660 {} +
+setfacl -R -m u::rwx,g::rwx,o::--- $DIR
+setfacl -R -m m::rwx $DIR
+
+find $DIR -type d -exec chmod 2770 {} +
+setfacl -R -d -m g::rwx,o::--- $DIR
+setfacl -R -d -m m::rwx $DIR
+
+
 
 dnf install -y policycoreutils-python-utils
-semanage fcontext -a -t public_content_rw_t "/home/git(/.*)?"
+semanage fcontext -a -t git_repo_t "/home/git(/.*)?"
 restorecon -R /home/git
 
 #--- Configuring git
