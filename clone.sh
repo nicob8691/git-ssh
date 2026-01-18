@@ -1,41 +1,32 @@
 #!/bin/bash
-set -e
+set -euo pipefail
+[ "$EUID" -eq 0 ] || { echo "This script must be run as root"; exit 1; }
 
 for repo in "$@"; do
+FOLDER="/home/git/$repo"
 
-	#--- Set repo dir variable
-	FOLDER="/home/git/$repo"
-
-	#--- Skip if already a valid Git repo
-	if git -C "$FOLDER" rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+	#--- Skip if already cloned -------------------------------------------
+	if [ -d "$FOLDER/.git" ]; then
 		echo "$repo already cloned. Skipping."
 		continue
 	fi
 
-	#--- Create repo dir
-	install -d -o "$(whoami)" -g gitusers -m 770 "$FOLDER"
-
-	#--- Clone repo
+	#--- Create repo dir & clone repo -------------------------------------
+	mkdir -p "$FOLDER"
 	git clone "git@github.com:nicob8691/$repo.git" "$FOLDER"
 
-	#--- Leave traceability of the git clone puller
-	echo "Git repo pulled by $(git config --get user.name)" > "$FOLDER/OWNER"
+	#--- Leave traceability of the git clone puller -----------------------
+	echo "Git repo pulled by $(git config --get user.name)" >> "$FOLDER/OWNER"
 
-	#--- Add OWNER to .gitignore if it doesn't exist
-	if [ ! -f "$FOLDER/.gitignore" ]; then
-		echo "OWNER" > "$FOLDER/.gitignore"
-	fi
+	#--- Ensure OWNER file is ignored -------------------------------------
+	grep -qx "OWNER" "$FOLDER/.gitignore" 2>/dev/null || \
+		echo "OWNER" >> "$FOLDER/.gitignore"
 
-	#--- Ensure ownership and file modes
-	chgrp -R gitusers "$FOLDER"
-	chmod -R 770 "$FOLDER"
-	[ -f "$FOLDER/LICENSE" ] && chmod 440 "$FOLDER/LICENSE"
-	[ -f "$FOLDER/OWNER" ] && chmod 440 "$FOLDER/OWNER"
+	#--- Ownership --------------------------------------------------------
+	chown -R root:gitusers "$FOLDER"
 
-	#--- Allow global git access to this directory
+	#--- Allow git access
 	git config --system --add safe.directory "$FOLDER"
 
 done
-
 ### END ###
-
